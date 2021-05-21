@@ -4,7 +4,7 @@
 args <- commandArgs(TRUE)
 SAMPLEID <- toString(args[1]) ## tcga sample id with format: "TCGA-4G-AAZO"
 DPFILE <- toString(args[2]) ## full path to $SAMPLEID_dpInput.txt
-WORKINGDIR <- toString(args[2]) ## working directory (all outputs go here and dpinput should be here as well)
+WORKINGDIR <- toString(args[3]) ## working directory (all outputs go here and dpinput should be here as well)
 ## ################################################################
 ## author: maxime.tarabichi@ulb.be, maxime.tarabichi@crick.ac.uk
 ## ################################################################
@@ -37,9 +37,9 @@ gender <- ifelse(pp_summary[pp_summary$name==SAMPLEID,"sex"]=="XY","male","femal
 ## ################################################################
 ## Load and filter data
 data <- read.table(file=DPFILE,header=T)
-if(length(table(dat$nMaj2))>0){data=data}else{data=data[,! colnames %in% "nMaj2"
-if(length(table(dat$nMin2))>0){data=data}else{data=data[,! colnames %in% "nMin2"
-if(length(table(dat$frac2))>0){data=data}else{data=data[,! colnames %in% "frac2"
+if(length(table(data$nMaj2))>0){data=data}else{data=data[,! colnames(data) %in% "nMaj2"]}
+if(length(table(data$nMin2))>0){data=data}else{data=data[,! colnames(data) %in% "nMin2"]}
+if(length(table(data$frac2))>0){data=data}else{data=data[,! colnames(data) %in% "frac2"]}
 if(substr(data[1,'chr'],1,3)=='chr'){chrom='chr'}else{chrom=NULL}
 dataset <- DPClust:::load.data.inner(list(data=data),
                                      cellularity=purity,
