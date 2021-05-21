@@ -29,7 +29,7 @@ outputs:
   dp_plot:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__DirchletProcessplot.png
+      glob: $(inputs.sampleid)__DirichletProcessplot.png
   dp_polygon:
     type: File
     outputBinding:
