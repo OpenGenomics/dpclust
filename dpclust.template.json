@@ -1,3 +1,7 @@
 {
-  "sampleid" : "sample_in"
+  "sampleid" : "sample_in",
+  "dpinput" : {
+    "class" : "File",
+    "path" : "dpinput_in"
+  }
 }

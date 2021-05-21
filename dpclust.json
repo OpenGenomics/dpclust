@@ -1,0 +1,7 @@
+{
+  "sampleid" : "TCGA-4G-AAZO",
+  "dpinput" : {
+    "class" : "File",
+    "path" : "/home/groups/Spellmandata/chiotti/gdan_pipelines/heterogeneity/tools/dpclust/TCGA-4G-AAZO_dpInput.txt"
+  }
+}

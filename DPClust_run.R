@@ -3,6 +3,7 @@
 ## ################################################################
 args <- commandArgs(TRUE)
 SAMPLEID <- toString(args[1]) ## tcga sample id with format: "TCGA-4G-AAZO"
+DPFILE <- toString(args[2]) ## full path to $SAMPLEID_dpInput.txt
 WORKINGDIR <- toString(args[2]) ## working directory (all outputs go here and dpinput should be here as well)
 ## ################################################################
 ## author: maxime.tarabichi@ulb.be, maxime.tarabichi@crick.ac.uk
@@ -26,7 +27,7 @@ setwd(WORKINGDIR)
 ## ################################################################
 
 ## ################################################################
-DPFILE <- paste0(SAMPLEID,"_dpInput.txt")
+#DPFILE <- paste0(SAMPLEID,"_dpInput.txt")
 pp_summary <- read.table(PATHSUMMARY,sep="\t",header=T)
 purity <- pp_summary[pp_summary$name==SAMPLEID,"purity"]
 ploidy <- pp_summary[pp_summary$name==SAMPLEID,"ploidy"]
@@ -36,6 +37,10 @@ gender <- ifelse(pp_summary[pp_summary$name==SAMPLEID,"sex"]=="XY","male","femal
 ## ################################################################
 ## Load and filter data
 data <- read.table(file=DPFILE,header=T)
+if(length(table(dat$nMaj2))>0){data=data}else{data=data[,! colnames %in% "nMaj2"
+if(length(table(dat$nMin2))>0){data=data}else{data=data[,! colnames %in% "nMin2"
+if(length(table(dat$frac2))>0){data=data}else{data=data[,! colnames %in% "frac2"
+if(substr(data[1,'chr'],1,3)=='chr'){chrom='chr'}else{chrom=NULL}
 dataset <- DPClust:::load.data.inner(list(data=data),
                                      cellularity=purity,
                                      Chromosome="chr",
@@ -47,7 +52,7 @@ dataset <- DPClust:::load.data.inner(list(data=data),
                                      mutation.copy.number="mutation.copy.number",
                                      subclonal.fraction="subclonal.fraction",
                                      is.male=if(gender=="male") T else F,
-                                     supported_chroms=paste0("chr",c(1:22,"X")),
+                                     supported_chroms=paste0(chrom,c(1:22,"X")),
                                      mutation_type="SNV")
 ## ################################################################
 

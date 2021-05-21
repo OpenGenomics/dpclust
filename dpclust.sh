@@ -24,20 +24,23 @@ function usage()
         echo "NOTE #1: All input files must be in the same directory as *this* script."
 	echo "NOTE #2: The TMPJSON is a JSON template found in the same directory as *this* script. Do not modify this file."
         echo
-        echo "Usage: $0 [ -s $SAMPLE -o $OUTDIR"
+        echo "Usage: $0 [ -s $SAMPLE -d $DPINPUT -o $OUTDIR"
         echo
 	echo " [-s SAMPLE]       - Sample identifier in the format of TCGA-XX-XXXX"
+        echo " [-d DPINPUT]      - Full path and name of the $SAMPLE_dpInput.txt file."
 	echo " [-o OUTDIR]       - Full path and name of the directory to which output will be written."
         exit
 }
 
 SAMPLE=""
+DPINPUT=""
 OUTDIR=""
 
-while getopts ":s:o:h" Option
+while getopts ":s:d:o:h" Option
         do
         case $Option in
                 s ) SAMPLE="$OPTARG" ;;
+                d ) DPINPUT="OPTARG" ;;
 		o ) OUTDIR="$OPTARG" ;;
                 h ) usage ;;
                 * ) echo "unrecognized argument. use '-h' for usage information."; exit -1 ;;
@@ -45,7 +48,7 @@ while getopts ":s:o:h" Option
 done
 shift $(($OPTIND - 1))
 
-if [[ "$OUTDIR" == "" ]]
+if [[ "$OUTDIR" == "" || "$DPINPUT" == "" ]]
 then
         usage
 fi
@@ -73,14 +76,15 @@ CWL=./dpclust.cwl
 TMPJSON=./dpclust.template.json
 JSON=$WORKDIR/dpclust.json
 
-sed -e "s|sample_in|$SAMPLE|g" $TMPJSON > $JSON
+sed -e "s|sample_in|$SAMPLE|g" -e "s|dpinput_in|$WORKDIR\/`basename $DPINPUT`|g" $TMPJSON > $JSON
 
-cp -r ./*_allDirichletProcessInfo.txt $CWL $WORKDIR
+cp -r $DPINPUT $CWL $WORKDIR
 
 cd $WORKDIR
 time cwltool --no-match-user $CWL $JSON
 
-rm *_allDirichletProcessInfo.txt
+rm $SAMPLE_dpInput.txt
+
 tar czf $SAMPLE_out.tar.gz $SAMPLE*
 rsync -a $SAMPLE_out.tar.gz $OUTPUT/
 
