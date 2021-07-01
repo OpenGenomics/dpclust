@@ -22,39 +22,27 @@ inputs:
       position: 3
 
 outputs:
-  dp_density:
+  best_cluster:
     type: File
-    outputBinding:
-      glob: $(inputs.sampleid)__DirichletProcessplotdensity.txt
-  dp_plot:
-    type: File
-    outputBinding:
-      glob: $(inputs.sampleid)__DirichletProcessplot.png
-  dp_polygon:
-    type: File
-    outputBinding:
-      glob: $(inputs.sampleid)__DirichletProcessplotpolygonData.txt
-  dp_locations:
-    type: File
-    outputBinding:
-      glob: $(inputs.sampleid)__DirichletProcessplot_with_cluster_locations.png
+    outputBinding: 
+      glob: $(inputs.sampleid)__bestClusterInfo.txt
   dp_locations2:
     type: File
     outputBinding:
       glob: $(inputs.sampleid)__DirichletProcessplot_with_cluster_locations_2.png
-  dp_cluster:
+  likelihoods_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__DP_and_cluster_info.txt
-  gsdata:
+      glob: $(inputs.sampleid)__mutationClusterLikelihoods.bed
+  assignments_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__gsdata.RData
-  local_optima:
+      glob: $(inputs.sampleid)__bestConsensusAssignments.bed
+  best_results:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__localOptima.txt
-  optima_info:
+      glob: $(inputs.sampleid)__bestConsensusResults.RData
+  mut_assign:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__optimaInfo.txt
+      glob: $(inputs.sampleid)__mutation_assignments.png
