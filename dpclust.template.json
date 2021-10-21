@@ -1,7 +1,6 @@
 {
   "sampleid" : "sample_in",
-  "dpinput" : {
-    "class" : "File",
-    "path" : "dpinput_in"
-  }
+  "purity" : purity_in,
+  "ploidy" : ploidy_in,
+  "gender" : "gender_in"
 }

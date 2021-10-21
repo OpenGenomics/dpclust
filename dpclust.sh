@@ -24,48 +24,45 @@ function usage()
         echo "NOTE #1: All input files must be in the same directory as *this* script."
 	echo "NOTE #2: The TMPJSON is a JSON template found in the same directory as *this* script. Do not modify this file."
         echo
-        echo "Usage: $0 [ -s $SAMPLE -d $DPINPUT -o $OUTDIR"
+        echo "Usage: $0 [ -s $SAMPLE -u $PURITY -l $PLOIDY -g $GENDER -d $DATDIR"
         echo
-	echo " [-s SAMPLE]       - Sample identifier in the format of TCGA-XX-XXXX"
-        echo " [-d DPINPUT]      - Full path and name of the $SAMPLE_dpInput.txt file."
-	echo " [-o OUTDIR]       - Full path and name of the directory to which output will be written."
+	echo " [-s SAMPLE]       - Sample identifier [string]"
+        echo " [-u PURITY]       - Tumor purity [float]"
+        echo " [-l PLOIDY]       - Tumor ploidy [float]"
+        echo " [-g GENDER]       - Patient gender [string]"
+	echo " [-d DATDIR]       - Full path and name of directory housing $SAMPLE_dpInput.txt [string]"
         exit
 }
 
 SAMPLE=""
-DPINPUT=""
-OUTDIR=""
+PURITY=""
+PLOIDY=""
+GENDER=""
+DATDIR=""
 
-while getopts ":s:d:o:h" Option
+while getopts ":s:u:l:g:d:h" Option
         do
         case $Option in
                 s ) SAMPLE="$OPTARG" ;;
-                d ) DPINPUT="OPTARG" ;;
-		o ) OUTDIR="$OPTARG" ;;
+                u ) PURITY="$OPTARG" ;;
+                l ) PLOIDY="$OPTARG" ;;
+                g ) GENDER="$OPTARG" ;;
+		d ) DATDIR="$OPTARG" ;;
                 h ) usage ;;
                 * ) echo "unrecognized argument. use '-h' for usage information."; exit -1 ;;
         esac
 done
 shift $(($OPTIND - 1))
 
-if [[ "$OUTDIR" == "" || "$DPINPUT" == "" ]]
-then
+if [[ "$DATDIR" == "" || "$PURITY" == "" || "$PLOIDY" == "" || "$GENDER" == "" || "$SAMPLE" == "" ]]
         usage
 fi
 
 source /home/groups/EllrottLab/activate_conda
 
-DRIVERS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-if [ ! -e $OUTDIR ];
+if [ ! -e $DIR ];
 then
-    mkdir -p $OUTDIR ;
-fi
-
-OUTPUT=$OUTDIR/$RUN_SAMPLE
-if [ ! -e $OUTPUT ];
-then
-    mkdir -p $OUTPUT ;
+    mkdir -p $DIR ;
 fi
 
 WORKDIR=`mktemp -d -p /mnt/scratch/ dpclust.XXX`
@@ -76,17 +73,19 @@ CWL=./dpclust.cwl
 TMPJSON=./dpclust.template.json
 JSON=$WORKDIR/dpclust.json
 
-sed -e "s|sample_in|$SAMPLE|g" -e "s|dpinput_in|$WORKDIR\/`basename $DPINPUT`|g" $TMPJSON > $JSON
+sed -e "s|sample_in|$SAMPLE|g" -e "s|purity_in|$PURITY|g" -e "s|ploidy_in|$PLOIDY|g" -e "s|gender_in|$GENDER|g" $TMPJSON > $JSON
 
-cp -r $DPINPUT $CWL $WORKDIR
+cp -r $SAMPLE $CWL $WORKDIR
+
+CACHE=/mnt/scratch/dpclust_cache
+mkdir -p $CACHE
 
 cd $WORKDIR
-time cwltool --no-match-user $CWL $JSON
+time cwltool --cache $CACHE --copy-outputs --no-match-user $CWL $JSON
 
-rm $SAMPLE_dpInput.txt
+tar czf $SAMPLE_out.tar.gz $SAMPLE/
+rsync -a $SAMPLE_out.tar.gz $DATDIR/
+rsync -a $CACHE $DATDIR/
 
-tar czf $SAMPLE_out.tar.gz $SAMPLE*
-rsync -a $SAMPLE_out.tar.gz $OUTPUT/
-
-cd $DRIVERS
+cd $DATDIR
 rm -rf $WORKDIR

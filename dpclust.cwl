@@ -11,38 +11,54 @@ inputs:
     type: string
     inputBinding:
       position: 1
-  dpinput:
-    type: File
+  purity:
+    type: float
     inputBinding:
       position: 2
+  ploidy:
+    type: float
+    inputBinding:
+      position: 3
+  gender:
+    type: string
+    inputBinding:
+      position: 4
   workdir:
     type: string
     default: ./
     inputBinding:
-      position: 3
+      position: 5
 
 outputs:
+  dp_info:
+    type: File
+    outputBinding:
+      glob: $(inputs.sampleid)*DP_and_cluster_info.txt
   best_cluster:
     type: File
     outputBinding: 
-      glob: $(inputs.sampleid)__bestClusterInfo.txt
+      glob: $(inputs.sampleid)*bestClusterInfo.txt
+  optima:
+    type: File
+    outputBinding:
+      glob $$(inputs.sampleid)*optimaInfo.txt
   dp_locations2:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__DirichletProcessplot_with_cluster_locations_2.png
+      glob: $(inputs.sampleid)*DirichletProcessplot_with_cluster_locations_2.png
   likelihoods_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__mutationClusterLikelihoods.bed
+      glob: $(inputs.sampleid)*mutationClusterLikelihoods.bed
   assignments_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__bestConsensusAssignments.bed
+      glob: $(inputs.sampleid)*bestConsensusAssignments.bed
   best_results:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__bestConsensusResults.RData
+      glob: $(inputs.sampleid)*bestConsensusResults.RData
   mut_assign:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)__mutation_assignments.png
+      glob: $(inputs.sampleid)*mutation_assignments.png
