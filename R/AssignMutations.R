@@ -12,7 +12,7 @@
 #' @param no.iters.burn.in Number of iterations to discard as burn in
 #' @return Standardised mutation clustering output, including clusters, mutation assignments and likelihoods
 #' @author dw9, sd11
-oneDimensionalClustering <- function(samplename, subclonal.fraction, GS.data, density, no.iters, no.iters.burn.in) {
+oneDimensionalClustering <- function(samplename, subclonal.fraction, GS.data, density, no.iters, no.iters.burn.in, rwnms) {
   no.muts = length(subclonal.fraction)
   normal.copy.number = rep(2,no.muts)
   post.burn.in.start = no.iters.burn.in
@@ -69,7 +69,7 @@ oneDimensionalClustering <- function(samplename, subclonal.fraction, GS.data, de
     most.likely.cluster = max.col(mutation.preferences)
     out = cbind(mutation.preferences, most.likely.cluster)
     colnames(out)[(ncol(out)-no.optima):ncol(out)] = c(paste("prob.cluster", 1:ncol(mutation.preferences),sep=""),"most.likely.cluster")
-    write.table(out, paste(samplename,"_DP_and_cluster_info.txt",sep=""), sep="\t", row.names=F, quote=F)
+    write.table(out, paste(samplename,"_DP_and_cluster_info.txt",sep=""), sep="\t", row.names=rwnms, quote=F)
 
     # Assemble a table with mutation assignments to each cluster
     cluster_assignment_counts = sapply(1:ncol(mutation.preferences), function(x, m) { sum(m==x) }, m=most.likely.cluster) #table(most.likely.cluster)
@@ -92,12 +92,15 @@ oneDimensionalClustering <- function(samplename, subclonal.fraction, GS.data, de
     cluster_locations = cluster_locations[clust_order,,drop=F]
     cluster_locations[,1] = 1:nrow(cluster_locations)
     mutation.preferences = mutation.preferences[,clust_order, drop=F]
+    names(mutation.preferences) = rwnms
     
     # get most likely cluster
     most.likely.cluster = max.col(mutation.preferences)
+    names(most.likely.cluster) = rwnms
     
     # Obtain likelyhood of most likely cluster assignments
     most.likely.cluster.likelihood = apply(mutation.preferences, 1, max)
+    names(most.likely.cluster.likelihood) = rwnms
     
   }else{
     warning("No local optima found when assigning mutations to clusters")
@@ -307,7 +310,7 @@ mutation_assignment_em = function(GS.data, mutCount, WTCount, subclonal.fraction
     consensus.assignments = all.consensus.assignments[[best.BIC.index]]
     pdf(file.path(outdir, paste(samplename, "_", no.iters, "iters_", no.iters.burn.in, "burnin_bestScatter.pdf",sep="")),height=4,width=4)
     
-    #its hard to distinguish more than 8 different colours
+    #its hard to distinguish more than 8 different colour
     max.cols = 8
     cols = rainbow(min(max.cols,no.nodes))
     plot.data = subclonal.fraction

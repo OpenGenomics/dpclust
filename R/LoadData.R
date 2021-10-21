@@ -21,7 +21,7 @@
 #' @param ref.genome.version Optional string that represents the reference genome, required when reading in VCF files
 #' @author sd11
 #' @return A list of tables, one for each type of information
-load.data <- function(list_of_data_files, cellularity, Chromosome, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase=NULL, is.male=T, is.vcf=F, ref.genome.version="hg19", supported_chroms=c(1:22)) {
+load.data <- function(list_of_data_files, cellularity, Chromosome, start, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase=NULL, is.male=T, is.vcf=F, ref.genome.version="hg19", supported_chroms=c(1:22)) {
   data=list()
   
   if (!is.vcf) {
@@ -44,18 +44,19 @@ load.data <- function(list_of_data_files, cellularity, Chromosome, position, WT.
   }
 
   # Ofload combining of the tables per sample into a series of tables per data type
-  return(load.data.inner(data, cellularity, Chromosome, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase, is.male, supported_chroms))
+  return(load.data.inner(data, cellularity, Chromosome, start, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase, is.male, supported_chroms))
 }
   
 #' This inner function takes a list of loaded data tables and transforms them into
 #' a dataset, which is a list that contains a table per data type
 #' @noRd
-load.data.inner = function(list_of_tables, cellularity, Chromosome, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase, is.male, supported_chroms, mutation_type="SNV") {
+load.data.inner = function(list_of_tables, cellularity, Chromosome, start, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase, is.male, supported_chroms, mutation_type="SNV") {
   no.subsamples = length(list_of_tables)
   no.muts = nrow(list_of_tables[[1]])
   
   # One matrix for each data type and propagate it
   chromosome = matrix(0,no.muts,no.subsamples)
+  mut.start = matrix(0,no.muts,no.subsamples)
   mut.position = matrix(0,no.muts,no.subsamples)
   WTCount = matrix(0,no.muts,no.subsamples)
   mutCount = matrix(0,no.muts,no.subsamples)
@@ -66,7 +67,9 @@ load.data.inner = function(list_of_tables, cellularity, Chromosome, position, WT
   subclonalFraction = matrix(NA,no.muts,no.subsamples)
   phasing = matrix("unphased",no.muts,no.subsamples)
   for(s in 1:length(list_of_tables)){
-    chromosome[,s] = list_of_tables[[s]][,Chromosome]
+    prechr=matrix(as.numeric(gsub(list_of_tables[[s]][,Chromosome], pattern="X", replacement=23)))
+    chromosome[,s] = gsub(prechr,pattern=23,replacement="X")
+    mut.start[,s] = as.numeric(list_of_tables[[s]][,start])
     mut.position[,s] = as.numeric(list_of_tables[[s]][,position])
     WTCount[,s] = as.numeric(list_of_tables[[s]][,WT.count])
     mutCount[,s] = as.numeric(list_of_tables[[s]][,mut.count])
@@ -85,7 +88,7 @@ load.data.inner = function(list_of_tables, cellularity, Chromosome, position, WT
   kappa = matrix(1,no.muts,no.subsamples)
   for(i in 1:length(list_of_tables)){
     #multiply by no.chrs.bearing.mut, so that kappa is the fraction of reads required for fully clonal mutations, rather than mutation at MCN = 1
-    kappa[,i] = mutationCopyNumberToMutationBurden(1,list_of_tables[[i]][,subclonal.CN],cellularity[i]) * list_of_tables[[i]][,no.chrs.bearing.mut]
+    kappa[,i] = DPClust:::mutationCopyNumberToMutationBurden(1,list_of_tables[[i]][,subclonal.CN],cellularity[i]) * list_of_tables[[i]][,no.chrs.bearing.mut]
   }
 
   # Remove those mutations that have missing values
@@ -116,6 +119,7 @@ load.data.inner = function(list_of_tables, cellularity, Chromosome, position, WT
 
   # Remove mutations that have been flagged for various reasons
   chromosome = as.matrix(chromosome[select,])
+  mut.start = as.matrix(mut.start[select,])
   mut.position = as.matrix(mut.position[select,])
   WTCount = as.matrix(WTCount[select,])
   mutCount = as.matrix(mutCount[select,])
@@ -137,7 +141,7 @@ load.data.inner = function(list_of_tables, cellularity, Chromosome, position, WT
   full_data = NA
   most.similar.mut = NA
   
-  return(list(chromosome=chromosome, position=mut.position, WTCount=WTCount, mutCount=mutCount, 
+  return(list(chromosome=chromosome, start=mut.start, position=mut.position, WTCount=WTCount, mutCount=mutCount, 
               totalCopyNumber=totalCopyNumber, copyNumberAdjustment=copyNumberAdjustment, 
               non.deleted.muts=non.deleted.muts, kappa=kappa, mutation.copy.number=mutationCopyNumber, 
               subclonal.fraction=subclonalFraction, removed_indices=removed_indices,
@@ -262,7 +266,7 @@ add.in.cn.as.single.snv = function(dataset, cndata, cellularity, add.conflicts=T
     reads.per.clonal.copy = (cellularity*N/conf) / (cellularity*tumourCN + (1-cellularity)*2)
     mc = round(reads.per.clonal.copy*CNA_frac)
     wt = round(N/conf) - mc
-    mcn = mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
+    mcn = DPClust:::mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
 
     # Save the pseudo SNV in the dataset
     dataset$chromosome = rbind(dataset$chromosome, rep(cndata[i,]$chr, num.samples))
@@ -352,14 +356,14 @@ create_pseudo_snv = function(cndata.i, num_muts, N, conf, cellularity, dataset, 
     mc = rbinom(num_muts, round(N/conf), exp_mc/(N/conf))
     mc[mc==0] = 1
     wt = round(N/conf) - mc
-    mcn = mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
+    mcn = DPClust:::mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
     
   # single mutation - do not add binomial noise
   } else {
     num_muts = 1
     mc = round(reads.per.clonal.copy*cndata.i$frac1_A)
     wt = round(N/conf) - mc
-    mcn = mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
+    mcn = DPClust:::mutationBurdenToMutationCopyNumber(mc/(mc+wt), tumourCN, cellularity, 2)
   }
   
   # Save the pseudo SNVs in the dataset

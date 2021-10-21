@@ -18,7 +18,7 @@
 #' @return A list containing these components
 #' @author sd11
 #' @export
-make_run_params = function(no.iters, no.iters.burn.in, mut.assignment.type, num_muts_sample, is.male, min_muts_cluster=NULL, min_frac_muts_cluster=0.01, species="human", assign_sampled_muts=TRUE, supported_chroms=NULL, keep_temp_files=TRUE, generate_cluster_ordering=FALSE) {
+make_run_params = function(no.iters, no.iters.burn.in, mut.assignment.type, num_muts_sample, is.male, min_muts_cluster=NULL, min_frac_muts_cluster=0.01, species="human", assign_sampled_muts=TRUE, supported_chroms=NULL, keep_temp_files=TRUE, generate_cluster_ordering=TRUE) {
   if (is.null(supported_chroms)) {
     if (species=="human" | species=="Human") {
       # Set the expected chromosomes based on the sex
@@ -154,7 +154,8 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     # Note that the phase column is not used
     dataset = load.data(list_of_datafiles, 
                         cellularity=cellularity, 
-                        Chromosome="chr", 
+                        Chromosome="chr",
+                        start="start", 
                         position="end",
                         WT.count="WT.count", 
                         mut.count="mut.count", 
@@ -254,6 +255,7 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     ##############################
     # nD DP clustering
     ##############################
+    rwnms=paste(dataset$chromosome,paste(dataset$start,dataset$position,sep="-"),sep=":")
     clustering = DirichletProcessClustering(mutCount=dataset$mutCount, 
                                             WTCount=dataset$WTCount, 
                                             no.iters=no.iters, 
@@ -270,7 +272,8 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
                                             cluster_conc=cluster_conc,
                                             mut.assignment.type=mut.assignment.type,
                                             most.similar.mut=most.similar.mut,
-                                            max.considered.clusters=max.considered.clusters)
+                                            max.considered.clusters=max.considered.clusters,
+rwnms=rwnms)
     
   } else if (analysis_type == "replot_1d") {
     print("Running Remaking plots...")
@@ -355,7 +358,7 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     print("Writing out final output...")
     
     # Load the MCMC output as its needed to get cluster confidence intervals
-    density_file = file.path(outdir, paste(samplename, "_DirichletProcessplotdensity.txt", sep=""))
+    density_file = file.path(outdir, paste(samplename, "__DirichletProcessplotdensity.txt", sep=""))
     if (file.exists(density_file)) {
       density = read.table(density_file, header=T)
       colnames(density)[1] = "fraction.of.tumour.cells"
@@ -363,7 +366,7 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
       density = NA
     }
     
-    polygon_file = file.path(outdir, paste(samplename, "_DirichletProcessplotpolygonData.txt", sep=""))
+    polygon_file = file.path(outdir, paste(samplename, "__DirichletProcessplotpolygonData.txt", sep=""))
     if (file.exists(polygon_file)) {
       polygon.data = read.table(polygon_file, header=T)
     } else {
@@ -400,35 +403,35 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     }
     
     # 1D method and general files
-    .remove_file(paste(outfiles.prefix, "_removedMutationsIndex.txt", sep=""))
-    .remove_file(file.path(outdir, paste(samplename, "_DP_and_cluster_info.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_DirichletProcessplot.png", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_DirichletProcessplot_with_cluster_locations.png", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_DirichletProcessplotdensity.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_DirichletProcessplotpolygonData.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_localOptima.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_optimaInfo.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_gsdata.RData", sep="")))
+    .remove_file(paste(outfiles.prefix, "__removedMutationsIndex.txt", sep=""))
+    .remove_file(file.path(outdir, paste(samplename, "__DP_and_cluster_info.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__DirichletProcessplot.png", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__DirichletProcessplot_with_cluster_locations.png", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__DirichletProcessplotdensity.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__DirichletProcessplotpolygonData.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__localOptima.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__optimaInfo.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__gsdata.RData", sep="")))
     .remove_file(file.path(outdir, "dataset.RData"))
     
     # nD method files
-    .remove_file(file.path(outdir, paste(samplename, "_DP_and cluster_info_0.01.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_confInts_0.01.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_localHighConfidenceMultidimensionalOptima_0.01.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_localMultidimensionalOptima_0.01.txt", sep="")))
-    .remove_file(file.path(outdir, paste(samplename, "_optimaInfo_0.01.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__DP_and cluster_info_0.01.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__confInts_0.01.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__localHighConfidenceMultidimensionalOptima_0.01.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__localMultidimensionalOptima_0.01.txt", sep="")))
+    .remove_file(file.path(outdir, paste(samplename, "__optimaInfo_0.01.txt", sep="")))
     
     for (i in 1:(length(subsamples)-1)) {
       for (j in (i+1):length(subsamples)) {
-        .remove_file(file.path(outdir, paste(samplename, subsamples[i], subsamples[j], "_densityoutput.RData", sep="")))
-        .remove_file(file.path(outdir, paste(samplename, subsamples[i], subsamples[j], "_densityoutput.csv", sep="")))
+        .remove_file(file.path(outdir, paste(samplename, subsamples[i], subsamples[j], "__densityoutput.RData", sep="")))
+        .remove_file(file.path(outdir, paste(samplename, subsamples[i], subsamples[j], "__densityoutput.csv", sep="")))
         .remove_file(file.path(outdir, pattern=glob2rx(paste(samplename, subsamples[i], subsamples[j], "*densityData1.csv", sep="")), full.names=T))
         density_csv_files = list.files(outdir, pattern=glob2rx(paste(samplename, subsamples[i], subsamples[j], "*vals.csv", sep="")), full.names=T)
         for (infile in density_csv_files) { .remove_file(infile) }
       }
     }
     
-    nd_density_files = list.files(outdir, pattern="_2D_binomial_")
+    nd_density_files = list.files(outdir, pattern="__2D_binomial_")
     if (length(nd_density_files) > 0) { file.remove(nd_density_files) }
   }
   print("Done.")
@@ -454,7 +457,7 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
 #' @param generate_cluster_ordering Boolean specifying whether a possible cluster ordering should be determined (Default: FALSE)
 #' @param no.samples.cluster.order Number of mutations to sample (with replacement) to classify pairs of clusters into parent-offspring or siblings (Default: 1000)
 #' @author sd11
-writeStandardFinalOutput = function(clustering, dataset, most.similar.mut, outfiles.prefix, outdir, samplename, subsamplenames, GS.data, density, polygon.data, no.iters, no.iters.burn.in, min_muts_cluster, min_frac_muts_cluster, assign_sampled_muts=T, write_tree=F, generate_cluster_ordering=F, no.samples.cluster.order=1000) {
+writeStandardFinalOutput = function(clustering, dataset, most.similar.mut, outfiles.prefix, outdir, samplename, subsamplenames, GS.data, density, polygon.data, no.iters, no.iters.burn.in, min_muts_cluster, min_frac_muts_cluster, assign_sampled_muts=T, write_tree=F, generate_cluster_ordering=T, no.samples.cluster.order=1000) {
   num_samples = ncol(dataset$mutCount)
   
   ########################################################################
@@ -777,12 +780,12 @@ flatten_3d_to_2d = function(data, col_names) {
 #' @param mutationTypes Vector with mutation types, used for plotting
 #' @param max.considered.clusters Maximum number of clusters to consider
 #' @author sd11
-DirichletProcessClustering <- function(mutCount, WTCount, totalCopyNumber, copyNumberAdjustment, mutation.copy.number, cellularity, output_folder, no.iters, no.iters.burn.in, subsamplesrun, samplename, conc_param, cluster_conc, mut.assignment.type, most.similar.mut, mutationTypes, max.considered.clusters) {
+DirichletProcessClustering <- function(mutCount, WTCount, totalCopyNumber, copyNumberAdjustment, mutation.copy.number, cellularity, output_folder, no.iters, no.iters.burn.in, subsamplesrun, samplename, conc_param, cluster_conc, mut.assignment.type, most.similar.mut, mutationTypes, max.considered.clusters,rwnms) {
 
     if(!file.exists(output_folder)){
     dir.create(output_folder)
   }
-  GS.data = subclone.dirichlet.gibbs(mutCount=mutCount,
+  GS.data = DPClust:::subclone.dirichlet.gibbs(mutCount=mutCount,
                                     WTCount=WTCount,
                                     totalCopyNumber=totalCopyNumber,
                                     copyNumberAdjustment=copyNumberAdjustment,
@@ -804,7 +807,7 @@ DirichletProcessClustering <- function(mutCount, WTCount, totalCopyNumber, copyN
       for (j in (i+1):length(subsamplesrun)) {
         print(paste("Samples", subsamplesrun[i], "and", subsamplesrun[j], sep=" "))
         imageFile = file.path(output_folder, paste(samplename,subsamplesrun[i],subsamplesrun[j],"_iters",no.iters,"_concParam",conc_param,"_clusterWidth",1/cluster_conc,"_2D_binomial.png",sep=""))
-        density = Gibbs.subclone.density.est(mutation.copy.number[,c(i,j)]/copyNumberAdjustment[,c(i,j)],
+        density = DPClust:::Gibbs.subclone.density.est(mutation.copy.number[,c(i,j)]/copyNumberAdjustment[,c(i,j)],
                                              GS.data,
                                              imageFile,
                                              post.burn.in.start = no.iters.burn.in,
@@ -850,7 +853,7 @@ DirichletProcessClustering <- function(mutCount, WTCount, totalCopyNumber, copyN
     # 1D dataset, plot just the single density
     wd = getwd()
     setwd(output_folder)
-    res = Gibbs.subclone.density.est.1d(GS.data, 
+    res = DPClust:::Gibbs.subclone.density.est.1d(GS.data, 
                                             paste(samplename,"_DirichletProcessplot.png", sep=''), 
                                             samplename=samplename,
                                             post.burn.in.start=no.iters.burn.in, 
@@ -869,7 +872,7 @@ DirichletProcessClustering <- function(mutCount, WTCount, totalCopyNumber, copyN
     if (mut.assignment.type == 1) {
       subclonal.fraction = mutation.copy.number / copyNumberAdjustment
       subclonal.fraction[is.nan(subclonal.fraction)] = 0
-      consClustering = oneDimensionalClustering(samplename, subclonal.fraction, GS.data, density, no.iters, no.iters.burn.in)
+      consClustering = oneDimensionalClustering(samplename, subclonal.fraction, GS.data, density, no.iters, no.iters.burn.in, rwnms)
       setwd(wd) 
     } else if (mut.assignment.type == 2) {
       setwd(wd) # set the wd back earlier. The oneD clustering and gibbs sampler do not play nice yet and need the switch, the em assignment doesnt
