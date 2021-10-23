@@ -21,7 +21,7 @@ function usage()
         echo "It builds and launches the command to execute the OpenGenomics/dpclust CWL CommandLineTool within a docker container, "
         echo "then returns the output files. "
         echo
-        echo "NOTE #1: All input files must be in the same directory as *this* script."
+        echo "NOTE #1: All tool driving files must be in the same directory as *this* script."
 	echo "NOTE #2: The TMPJSON is a JSON template found in the same directory as *this* script. Do not modify this file."
         echo
         echo "Usage: $0 [ -s $SAMPLE -u $PURITY -l $PLOIDY -g $GENDER -d $DATDIR"
@@ -30,7 +30,7 @@ function usage()
         echo " [-u PURITY]       - Tumor purity [float]"
         echo " [-l PLOIDY]       - Tumor ploidy [float]"
         echo " [-g GENDER]       - Patient gender [string]"
-	echo " [-d DATDIR]       - Full path and name of directory housing $SAMPLE_dpInput.txt [string]"
+	echo " [-d DATDIR]       - Full path and name of directory housing $SAMPLE/$SAMPLE_dpInput.txt [string]"
         exit
 }
 
@@ -55,14 +55,15 @@ done
 shift $(($OPTIND - 1))
 
 if [[ "$DATDIR" == "" || "$PURITY" == "" || "$PLOIDY" == "" || "$GENDER" == "" || "$SAMPLE" == "" ]]
+then
         usage
 fi
 
 source /home/groups/EllrottLab/activate_conda
 
-if [ ! -e $DIR ];
+if [ ! -e $DATDIR ];
 then
-    mkdir -p $DIR ;
+    mkdir -p $DATDIR ;
 fi
 
 WORKDIR=`mktemp -d -p /mnt/scratch/ dpclust.XXX`
@@ -77,15 +78,10 @@ sed -e "s|sample_in|$SAMPLE|g" -e "s|purity_in|$PURITY|g" -e "s|ploidy_in|$PLOID
 
 cp -r $SAMPLE $CWL $WORKDIR
 
-CACHE=/mnt/scratch/dpclust_cache
-mkdir -p $CACHE
-
 cd $WORKDIR
-time cwltool --cache $CACHE --copy-outputs --no-match-user $CWL $JSON
+time cwltool --no-match-user $CWL $JSON
 
-tar czf $SAMPLE_out.tar.gz $SAMPLE/
-rsync -a $SAMPLE_out.tar.gz $DATDIR/
-rsync -a $CACHE $DATDIR/
+rsync -a $SAMPLE/ $DATDIR/
 
 cd $DATDIR
 rm -rf $WORKDIR

@@ -33,32 +33,32 @@ outputs:
   dp_info:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*DP_and_cluster_info.txt
+      glob: ./$(inputs.sampleid)*DP_and_cluster_info.txt
   best_cluster:
     type: File
     outputBinding: 
-      glob: $(inputs.sampleid)*bestClusterInfo.txt
+      glob: ./$(inputs.sampleid)*bestClusterInfo.txt
   optima:
     type: File
     outputBinding:
-      glob $$(inputs.sampleid)*optimaInfo.txt
+      glob ./$(inputs.sampleid)*optimaInfo.txt
   dp_locations2:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*DirichletProcessplot_with_cluster_locations_2.png
+      glob: ./$(inputs.sampleid)*DirichletProcessplot_with_cluster_locations_2.png
   likelihoods_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*mutationClusterLikelihoods.bed
+      glob: ./$(inputs.sampleid)*mutationClusterLikelihoods.bed
   assignments_bed:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*bestConsensusAssignments.bed
+      glob: ./$(inputs.sampleid)*bestConsensusAssignments.bed
   best_results:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*bestConsensusResults.RData
+      glob: ./$(inputs.sampleid)*bestConsensusResults.RData
   mut_assign:
     type: File
     outputBinding:
-      glob: $(inputs.sampleid)*mutation_assignments.png
+      glob: ./$(inputs.sampleid)*mutation_assignments.png
