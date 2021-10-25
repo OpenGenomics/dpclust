@@ -8,8 +8,7 @@ PURITY <- as.numeric(args[2]) ## tumor purity
 PLOIDY <- as.numeric(args[3]) ## tumor ploidy
 GENDER <- toString(args[4]) ## patient gender
 WORKINGDIR <- toString(args[5])  ## full path to working directory
-DATDIR <- file.path(WORKINGDIR, SAMPLEID)
-DPFILE <- paste0(SAMPLEID,"_dpInput.txt") ## must be in DATDIR
+DPFILE <- paste0(SAMPLEID,"_dpInput.txt") ## must be in working directory
 ## ################################################################
 ## author: maxime.tarabichi@ulb.be, maxime.tarabichi@crick.ac.uk
 ## ################################################################
@@ -41,6 +40,8 @@ ploidy <- PLOIDY
 #gender <- ifelse(pp_summary[pp_summary$name==SAMPLEID,"sex"]=="XY","male","female")
 gender <- GENDER
 ## ################################################################
+outdir <- file.path(WORKINGDIR,SAMPLEID)
+if (!file.exists(outdir)) { dir.create(outdir) }
 
 RunDP(analysis_type='nd_dp',
       run_params=make_run_params(no.iters=1250,
@@ -66,8 +67,8 @@ RunDP(analysis_type='nd_dp',
                                            conc_param=0.01,
                                            cluster_conc=5,
                                            max.considered.clusters=20),
-      outdir=DATDIR,
-      cna_params=list(datpath=DATDIR,
+      outdir=outdir,
+      cna_params=list(datpath=outdir,
                       cndatafiles=NULL,
                       co_cluster_cna=FALSE),
       mutphasingfiles=NULL)

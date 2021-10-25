@@ -2,6 +2,10 @@
 .Rhistory
 .RData
 .Rproj
+*err
+*out
 archive
 TCGA*
 dpclust.json
+slurm_dpclust.sh
+dpclust.sh
