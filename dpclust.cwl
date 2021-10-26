@@ -28,6 +28,10 @@ inputs:
     default: ./
     inputBinding:
       position: 5
+  dpfile:
+    type: File
+    inputBinding:
+      position: 6
 
 outputs:
   dpout:

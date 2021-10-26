@@ -2,5 +2,9 @@
   "sampleid" : "sample_in",
   "purity" : purity_in,
   "ploidy" : ploidy_in,
-  "gender" : "gender_in"
+  "gender" : "gender_in",
+  "dpfile" : {
+    "class" : "File",
+    "path" : "dpfile_in"
+  }
 }
