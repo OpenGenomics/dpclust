@@ -43,16 +43,6 @@ gender <- GENDER
 outdir <- file.path(WORKINGDIR,SAMPLEID)
 if (!file.exists(outdir)) { dir.create(outdir) }
 
-print("WORKINGDIR:")
-WORKINGDIR
-print("outdir:")
-outdir
-print("dir():")
-dir()
-print("DPFILE:")
-DPFILE
-
-
 RunDP(analysis_type='nd_dp',
       run_params=make_run_params(no.iters=1250,
                                  no.iters.burn.in=250,
