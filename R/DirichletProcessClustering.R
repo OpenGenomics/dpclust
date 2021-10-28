@@ -255,15 +255,8 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     ##############################
     # nD DP clustering
     ##############################
-    rwnms=paste(dataset$chromosome,paste(dataset$start,dataset$position,sep="-"),sep=":")
-    if (sum(duplicated(rwnms)) > 0) {
-      for (i in 1:length(rwnms)){
-        sfx=length(grep(rwnms[i:length(rwnms)], pattern=rwnms[i]))
-        if (sfx > 1){
-          rwnms[i]=paste(rwnms[i],sfx,sep='.')
-        }
-      }
-    }
+    rwnms=rownames(dataset$chromosome)
+
     clustering = DirichletProcessClustering(mutCount=dataset$mutCount, 
                                             WTCount=dataset$WTCount, 
                                             no.iters=no.iters, 
@@ -280,8 +273,7 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
                                             cluster_conc=cluster_conc,
                                             mut.assignment.type=mut.assignment.type,
                                             most.similar.mut=most.similar.mut,
-                                            max.considered.clusters=max.considered.clusters,
-rwnms=rwnms)
+                                            max.considered.clusters=max.considered.clusters, rwnms=rwnms)
     
   } else if (analysis_type == "replot_1d") {
     print("Running Remaking plots...")

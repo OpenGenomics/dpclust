@@ -53,7 +53,8 @@ load.data <- function(list_of_data_files, cellularity, Chromosome, start, positi
 load.data.inner = function(list_of_tables, cellularity, Chromosome, start, position, WT.count, mut.count, subclonal.CN, no.chrs.bearing.mut, mutation.copy.number, subclonal.fraction, phase, is.male, supported_chroms, mutation_type="SNV") {
   no.subsamples = length(list_of_tables)
   no.muts = nrow(list_of_tables[[1]])
-  
+  rwnms = rownames(list_of_tables[[1]])
+ 
   # One matrix for each data type and propagate it
   chromosome = matrix(0,no.muts,no.subsamples)
   mut.start = matrix(0,no.muts,no.subsamples)
@@ -131,7 +132,10 @@ load.data.inner = function(list_of_tables, cellularity, Chromosome, start, posit
   subclonalFraction = as.matrix(subclonalFraction[select,])
   phasing = as.data.frame(phasing[select,])
   mutationType = factor(rep(mutation_type, nrow(mutCount)), levels=c("SNV", "CNA", "indel"))
-  
+
+  rwnms = rwnms[select]
+  rownames(chromosome) = rwnms
+
   print("")
   print(paste("Removed",no.muts-nrow(WTCount), "mutations with missing data"))
   print("")
