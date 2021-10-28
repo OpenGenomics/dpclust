@@ -256,7 +256,6 @@ RunDP <- function(analysis_type, run_params, sample_params, advanced_params, out
     # nD DP clustering
     ##############################
     rwnms=paste(dataset$chromosome,paste(dataset$start,dataset$position,sep="-"),sep=":")
-    rwnms=paste(df$chr, paste(df$start, df$end, sep="-"),sep=":")
     if (sum(duplicated(rwnms)) > 0) {
       for (i in 1:length(rwnms)){
         sfx=length(grep(rwnms[i:length(rwnms)], pattern=rwnms[i]))
