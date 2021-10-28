@@ -4,7 +4,7 @@ label: dpclust
 baseCommand: [ Rscript, --vanilla, --slave, /opt/dpclust/DPClust_run.R ]
 requirements:
   - class: DockerRequirement
-    dockerImageId: docker.io/opengenomics/dpclust:v3.0
+    dockerPull: quay.io/ohsugdanpipelines/dpclust
 
 inputs:
   sampleid:
