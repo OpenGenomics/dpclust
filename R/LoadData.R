@@ -29,10 +29,11 @@ load.data <- function(list_of_data_files, cellularity, Chromosome, start, positi
       rwnms=read.table(list_of_data_files,header=T,row.names=NULL)[,1]
       if(any(duplicated(rwnms))){
         rwnms=make.names(rwnms,unique=T)
-        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=rwnms, stringsAsFactors=F, sep="\t")
+        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=NULL, stringsAsFactors=F, sep="\t")[,-1]
+        rownames(data[[s]])=rwnms
       }else{
-        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=rwnms, stringsAsFactors=F, sep="\t")
-
+        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=NULL, stringsAsFactors=F, sep="\t")[,-1]
+        rownames(data[[s]])=rwnms
       }
     }
   } else {
