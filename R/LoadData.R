@@ -26,7 +26,14 @@ load.data <- function(list_of_data_files, cellularity, Chromosome, start, positi
   
   if (!is.vcf) {
     for(s in 1:length(list_of_data_files)) {
-      data[[s]] = read.table(list_of_data_files[s], header=T, stringsAsFactors=F, sep="\t")
+      rwnms=read.table(list_of_data_files,header=T,row.names=NULL)[,1]
+      if(any(duplicated(rwnms))){
+        rwnms=make.names(rwnms,unique=T)
+        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=rwnms, stringsAsFactors=F, sep="\t")
+      }else{
+        data[[s]] = read.table(list_of_data_files[s], header=T, row.names=rwnms, stringsAsFactors=F, sep="\t")
+
+      }
     }
   } else {
     print("VCF files are no longer supported")
