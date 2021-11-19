@@ -21,7 +21,7 @@ R -q -e 'install.packages([DPClust tarball], repos=NULL, type="source")'
 The DPClust package comes with an example pipeline and some simulated data in `inst/example`. Run the examples as follows:
 ```
 # check out the repository
-git clone git@github.com:Wedge-Oxford/dpclust.git
+git clone git@github.com:OpenGenomics/dpclust.git
 cd dpclust/inst/example
 
 # single sample case
@@ -43,7 +43,7 @@ docker run -it -v `pwd`:/mnt/output/ quay.io/ohsugdanpipelines/dpclust /opt/dpcl
 
 Example data is included with this package. See `inst/extdata/simulated_data/simulated_1d.txt`.
 
-The DPClust input file should be generated via the DPClust pre-processing package ([dpclust3p](https://github.com/Wedge-Oxford/dpclust3p)). Example pipelines to generate the DPClust input file ([here](https://github.com/OpenGenomics/dpclust3p/blob/master/inst/example/preproc_pipeline_simple.R) and [here](https://github.com/OpenGenomics/dpclust3p/blob/master/inst/example/preproc_pipeline_caveman.R)).
+The DPClust input file should be generated via the DPClust pre-processing package ([dpclust3p](https://github.com/OpenGenomics/dpclust3p)). Example pipelines to generate the DPClust input file ([here](https://github.com/OpenGenomics/dpclust3p/blob/master/inst/example/preproc_pipeline_simple.R) and [here](https://github.com/OpenGenomics/dpclust3p/blob/master/inst/example/preproc_pipeline_caveman.R)).
 
 ### DPClust input file
 
