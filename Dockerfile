@@ -6,7 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get -y install r-base libxml2 libxml2-dev libcurl4-gnutls-dev libssl-dev curl git
 
-RUN R -q -e 'install.packages("BiocManager"); BiocManager::install(c("optparse","KernSmooth","ks","lattice","ggplot2","gridExtra","VariantAnnotation","GenomicRanges","Rsamtools","IRanges","S4Vectors","reshape2","data.table"))'
+RUN R -q -e 'install.packages("BiocManager"); BiocManager::install(c("optparse","KernSmooth","ks","lattice","ggplot2","gridExtra","VariantAnnotation","GenomicRanges","Rsamtools","IRanges","S4Vectors","reshape2","data.table","R.utils"))'
 
 RUN mkdir -p /opt/dpclust
 COPY . /opt/dpclust/
