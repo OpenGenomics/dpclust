@@ -4,8 +4,9 @@ options(scipen=1)
 ## ################################################################
 args <- commandArgs(TRUE)
 SAMPLEID <- toString(args[1]) ## sample id
-PURITY <- as.numeric(args[2]) ## tumor purity
-PLOIDY <- as.numeric(args[3]) ## tumor ploidy
+RHOPSI <- toString(args[2])  ## battenberg output
+#PURITY <- as.numeric(args[2]) ## tumor purity
+#PLOIDY <- as.numeric(args[3]) ## tumor ploidy
 GENDER <- toString(args[4]) ## patient gender
 WORKINGDIR <- toString(args[5])  ## full path to working directory
 DPFILE <- toString(args[6]) ## must be in working directory
@@ -22,21 +23,23 @@ DPFILE <- toString(args[6]) ## must be in working directory
 
 ## ################################################################
 ## package dependencies for this script
-library(dpclust3p)
-library(DPClust)
+lib="/home/groups/Spellmandata/chiotti/R/x86_64-redhat-linux-gnu-library/3.6"
+library(dpclust3p,lib=lib)
+library(DPClust,lib=lib)
 ## ################################################################
 
 ## ################################################################
-#setwd(WORKINGDIR)
+setwd(WORKINGDIR)
 ## ################################################################
 
 ## ################################################################
 #DPFILE <- paste0(SAMPLEID,"_dpInput.txt")
 #pp_summary <- read.table(PATHSUMMARY,sep="\t",header=T)
+rho_psi_file <- read.table(RHOPSI, sep="\t",header=T)
 #purity <- pp_summary[pp_summary$name==SAMPLEID,"purity"]
-purity <- PURITY
+purity <- rho_psi_file["FRAC_GENOME","rho"]
 #ploidy <- pp_summary[pp_summary$name==SAMPLEID,"ploidy"]
-ploidy <- PLOIDY
+ploidy <- rho_psi_file["FRAC_GENOME","ploidy"]
 #gender <- ifelse(pp_summary[pp_summary$name==SAMPLEID,"sex"]=="XY","male","female")
 gender <- GENDER
 ## ################################################################

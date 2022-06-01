@@ -1,7 +1,7 @@
 cwlVersion: v1.0
 class: CommandLineTool
 label: dpclust
-baseCommand: [ Rscript, --vanilla, --slave, /opt/dpclust/DPClust_run.R ]
+baseCommand: [ Rscript, --vanilla, --slave, /opt/dpclust/DPClust_runi.R ]
 requirements:
   - class: DockerRequirement
     dockerPull: quay.io/ohsugdanpipelines/dpclust
@@ -11,27 +11,23 @@ inputs:
     type: string
     inputBinding:
       position: 1
-  purity:
-    type: float
+  rho_psi:
+    type: File
     inputBinding:
       position: 2
-  ploidy:
-    type: float
-    inputBinding:
-      position: 3
   gender:
     type: string
     inputBinding:
-      position: 4
+      position: 3
   workdir:
     type: string
     default: ./
     inputBinding:
-      position: 5
+      position: 4
   dpfile:
     type: File
     inputBinding:
-      position: 6
+      position: 5
 
 outputs:
   dpout:
