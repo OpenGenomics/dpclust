@@ -23,9 +23,11 @@ DPFILE <- toString(args[6]) ## must be in working directory
 
 ## ################################################################
 ## package dependencies for this script
-lib="/home/groups/Spellmandata/chiotti/R/x86_64-redhat-linux-gnu-library/3.6"
-library(dpclust3p,lib=lib)
-library(DPClust,lib=lib)
+#lib="/home/groups/Spellmandata/chiotti/R/x86_64-redhat-linux-gnu-library/3.6"
+#library(dpclust3p,lib=lib)
+#library(DPClust,lib=lib)
+library(dpclust3p)
+library(DPClust)
 ## ################################################################
 
 ## ################################################################

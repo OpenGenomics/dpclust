@@ -1,7 +1,7 @@
 cwlVersion: v1.0
 class: CommandLineTool
 label: dpclust
-baseCommand: [ Rscript, --vanilla, --slave, /opt/dpclust/DPClust_runi.R ]
+baseCommand: [ Rscript, --vanilla, --slave, /opt/dpclust/DPClust_run.R ]
 requirements:
   - class: DockerRequirement
     dockerPull: quay.io/ohsugdanpipelines/dpclust
