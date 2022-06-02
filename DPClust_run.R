@@ -7,9 +7,9 @@ SAMPLEID <- toString(args[1]) ## sample id
 RHOPSI <- toString(args[2])  ## battenberg output
 #PURITY <- as.numeric(args[2]) ## tumor purity
 #PLOIDY <- as.numeric(args[3]) ## tumor ploidy
-GENDER <- toString(args[4]) ## patient gender
-WORKINGDIR <- toString(args[5])  ## full path to working directory
-DPFILE <- toString(args[6]) ## must be in working directory
+GENDER <- toString(args[3]) ## patient gender
+WORKINGDIR <- toString(args[4])  ## full path to working directory
+DPFILE <- toString(args[5]) ## must be in working directory
 ## ################################################################
 ## author: maxime.tarabichi@ulb.be, maxime.tarabichi@crick.ac.uk
 ## ################################################################
